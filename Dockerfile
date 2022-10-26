@@ -17,9 +17,9 @@ RUN rm -rf /usr/local/src/*gz \
         && apt-get clean all \
         && rm -rf /var/cache/apt/archives/* \
         && rm -rf /var/lib/apt/lists/* 
-COPY docker-mysql8.sh /usr/local/bin
+COPY docker-entrypoint.sh /usr/local/bin
 COPY my.cnf /etc/
-RUN  chmod 777 /usr/local/bin/docker-mysql8.sh
-ENTRYPOINT ["docker-mysql8.sh"]
+RUN  chmod 777 /usr/local/bin/docker-entrypoint.sh
+ENTRYPOINT ["docker-entrypoint.sh"]
 EXPOSE 3306
 CMD ["--user=mysql"]
