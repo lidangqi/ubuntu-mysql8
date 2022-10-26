@@ -3,14 +3,14 @@ set -o errexit #运行某一行出错时立即退出。
 set -- mysqld_safe $@ #定义启动命令
 echo "\$@:$@"
 #初始化传值变量
-db_user=${db_user:=""}
-db_password=${db_password:=""}
+MYSQL_USER=${MYSQL_USER:=""}
+MYSQL_PASSWORD=${MYSQL_PASSWORD:=""}
 #如果是变量值为root则重新赋值为空
-if [ "${db_user}" = "root" ]
-  then db_user=""
+if [ "${MYSQL_USER}" = "root" ]
+  then MYSQL_USER=""
 fi
-echo "db_user=$db_user"
-echo "db_password=$db_password"
+echo "MYSQL_USER=$MYSQL_USER"
+echo "MYSQL_PASSWORD=$MYSQL_PASSWORD"
  
 echo "----开始初始化mysql----------------------"
 if [ ! -f /data/mysql/logs/mysql.err ];then
@@ -72,24 +72,24 @@ for i in {2..0}; do
     fi
 done
 echo "开始进入匹配..."
-if [ "${db_user}" != "" -o "${db_password}" != "" ];then
+if [ "${MYSQL_USER}" != "" -o "${MYSQL_PASSWORD}" != "" ];then
         echo "指定了变量--"
         echo "进入匹配开始"
  
         #用户不为空,密码不为空---创建用户名 密码,默认授权管理员权限
-        if [ "${db_user}" != "" -a "${db_password}" != "" -a "${db_database}" = "" ];then
-                c="CREATE USER IF NOT EXISTS '"${db_user}"'@'%'; ALTER USER '"${db_user}"'@'%' IDENTIFIED WITH mysql_native_password by '"${db_password}"';flush privileges;"
+        if [ "${MYSQL_USER}" != "" -a "${MYSQL_PASSWORD}" != "" -a "${db_database}" = "" ];then
+                c="CREATE USER IF NOT EXISTS '"${MYSQL_USER}"'@'%'; ALTER USER '"${MYSQL_USER}"'@'%' IDENTIFIED WITH mysql_native_password by '"${MYSQL_PASSWORD}"';flush privileges;"
                 echo "$c" | $mysql &> /dev/null && echo "添加成功" || echo "创建用户失败"
  
         #用户名为空,密码不为空,数据库为空-------------修改root密码
-        elif [ "${db_user}" = "" -a "${db_password}" != "" -a "${db_database}" = "" ];then
-                c="ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password by '${db_password}';flush privileges;"
+        elif [ "${MYSQL_USER}" = "" -a "${MYSQL_PASSWORD}" != "" -a "${db_database}" = "" ];then
+                c="ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password by '${MYSQL_PASSWORD}';flush privileges;"
         echo $c
                 echo "$c" | $mysql &> /dev/null &&  echo "添加成功" || echo "修改密码失败"
  
         else
                 echo "没有匹配项目"
-                echo "help:docker xxx image db_user=xx db_password=xx db_database=xx"
+                echo "help:docker xxx image MYSQL_USER=xx MYSQL_PASSWORD=xx db_database=xx"
                 exit 1
         fi
 else
